@@ -1,0 +1,4 @@
+If clean, create the watched files directory and a test file:
+bashmkdir ~/COS332PRAC8/watched_files
+echo "This is my important document" > ~/COS332PRAC8/watched_files/notes.txt
+echo "Project deadline is tomorrow" > ~/COS332PRAC8/watched_files/report.txt
