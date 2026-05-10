@@ -1,0 +1,6 @@
+ls -la ~/ftp_backup/
+//u should see 
+notes.txt
+notes.txt.000
+report.txt
+report.txt.000

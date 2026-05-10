@@ -1,0 +1,14 @@
+echo "Updated content - deadline moved to next week" >> ~/prac8/watched_files/notes.txt
+//run opt 2 AGAIN AND Ex[et ] to see
+[MONITOR] Modified file detected: notes.txt
+And it should upload notes.txt.001 as the new version
+/////
+Test the Deletion Handling
+Delete a file locally:
+bashrm ~/prac8/watched_files/report.txt
+Run option 2 again. You should see:
+[MONITOR] Deleted file detected: report.txt
+[BACKUP] Keeping backup on server — removing from local tracking only.
+Then verify the backup is still on the server:
+bashls ~/ftp_backup/
+report.txt and report.txt.000 should still be there — proving we never delete backups.
