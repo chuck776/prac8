@@ -1,0 +1,21 @@
+//install vsftpd: ftp daemon
+sudo apt install vsftpd -y
+//configure to allow local user writes
+sudo nano /etc/vsftpd.conf
+//FIND AND SET THESE FIELDS
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+local_umask=022
+chroot_local_user=NO
+//ADD AT BOTTOM
+allow_writeable_chroot=YES
+pasv_enable=YES
+pasv_min_port=40000
+pasv_max_port=50000
+//SAVE AND RESTART
+sudo systemctl restart vsftpd
+sudo systemctl status vsftpd
+//CREATE FTP backup
+mkdir ~/ftp_backup
+chmod 755 ~/ftp_backup

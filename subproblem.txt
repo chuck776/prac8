@@ -1,0 +1,31 @@
+Subproblem 1 — Detecting Changes:
+We store the last modified timestamp of every file in the watched directory. Every poll cycle we compare current timestamps against stored ones. Three cases:
+//
+File exists in stored + current, timestamps differ → FILE MODIFIED → upload
+File exists in current but not stored              → NEW FILE      → upload
+File exists in stored but not current 
+             → FILE DELETED  → do nothing (keep backup)
+//
+Subproblem 2 — The Deletion Problem:
+The assignment specifically says do NOT delete backup files when local files are deleted. This is the safe approach — you might accidentally delete a file and want it back. We simply leave the backup on the server untouched.
+
+CLIENT                          SERVER
+  │                               │
+  ├──[connect port 21]───────────►│
+  │◄──────────────────────────────┤ 220 ready
+  ├── USER username ─────────────►│
+  │◄──────────────────────────────┤ 331 need password
+  ├── PASS password ─────────────►│
+  │◄──────────────────────────────┤ 230 logged in
+  ├── TYPE I ─────────────────────►│  (binary mode)
+  │◄──────────────────────────────┤ 200 ok
+  ├── PASV ───────────────────────►│  (request passive mode)
+  │◄──────────────────────────────┤ 227 entering passive (ip,p1,p2)
+  ├──[connect data port]──────────►│  (open data connection)
+  ├── STOR filename ──────────────►│  (start upload)
+  │◄──────────────────────────────┤ 150 ready
+  ├──[send file bytes on data]────►│
+  ├──[close data connection]───────►│
+  │◄──────────────────────────────┤ 226 transfer complete
+  ├── QUIT ───────────────────────►│
+  │◄──────────────────────────────┤ 221 bye
