@@ -11,20 +11,20 @@ Zamokuhle Zwane
 
 ## Project Overview
 
-This system monitors a local directory (`watched_files/`) and automatically uploads any changed files to a remote FTP server. It also provides a restore tool that can pull any previous version of a file back down from the server — useful for recovering from accidental deletions or overwrites.
+This system monitors a local directory (`watched_files/`) and automatically uploads any changed files to a remote FTP server. It also provides a restore tool that can pull any previous version of a file back down from the server - useful for recovering from accidental deletions or overwrites.
 
 The program demonstrates low-level socket programming and direct FTP protocol implementation without relying on any FTP client libraries.
 
 ### Key Features
 
 - Pure socket-based FTP communication (no Apache Commons Net, no `sun.net.ftp`)
-- RFC 959 compliant — implements the full FTP command/response cycle from scratch
-- Passive mode (PASV) data connections — properly parses the `227` response to extract the server's IP and port
+- RFC 959 compliant - implements the full FTP command/response cycle from scratch
+- Passive mode (PASV) data connections - properly parses the `227` response to extract the server's IP and port
 - File change detection via timestamp polling
-- Versioned backups — every upload is saved as `file.txt.000`, `file.txt.001`, `file.txt.002` etc., persisted across restarts
-- Safe deletion handling — local deletions never remove the server backup
-- Bidirectional transfer — STOR for upload, RETR for restore
-- Interactive restore CLI — `java RestoreClient notes.txt 2` pulls version 2 back to your machine
+- Versioned backups - every upload is saved as `file.txt.000`, `file.txt.001`, `file.txt.002` etc., persisted across restarts
+- Safe deletion handling - local deletions never remove the server backup
+- Bidirectional transfer - STOR for upload, RETR for restore
+- Interactive restore CLI - `java RestoreClient notes.txt 2` pulls version 2 back to your machine
 
 
 ## How FTP Actually Works (The Weird Part)
@@ -35,7 +35,7 @@ FTP is one of the stranger protocols you'll encounter. Most protocols use a sing
 This is where all commands are sent and responses received. It stays open for the entire session. Every command you send (`USER`, `PASS`, `STOR`, `RETR`, etc.) goes here, and every server response (`220`, `230`, `226`, etc.) comes back here.
 
 **2. The Data Connection (ephemeral port)**  
-Every time actual data needs to move — whether that's a file upload, download, or even just a directory listing — a brand new TCP connection is opened just for that transfer, then closed immediately after. This is the part that trips people up.
+Every time actual data needs to move - whether that's a file upload, download, or even just a directory listing - a brand new TCP connection is opened just for that transfer, then closed immediately after. This is the part that trips people up.
 
 ### Active vs Passive Mode
 
@@ -124,8 +124,8 @@ Timestamps persist across restarts via `TimestampStore`. Version counters also p
 
 Every time a file is uploaded, two copies land on the server:
 
-1. `notes.txt.000` / `notes.txt.001` etc. — the immutable version history
-2. `notes.txt` — always the latest copy (overwritten each time)
+1. `notes.txt.000` / `notes.txt.001` etc. - the immutable version history
+2. `notes.txt` - always the latest copy (overwritten each time)
 
 Version numbers persist in `versions.dat`:
 
@@ -141,11 +141,11 @@ So even if you restart the backup client, the next upload of `notes.txt` correct
 
 ```
 prac8/
-├── BackupClient.java     # Main program — menu, backup loop, orchestration
-├── FtpConnection.java    # Raw socket FTP — all protocol commands
-├── FileMonitor.java      # Directory watcher — detects NEW/MODIFIED/DELETED
+├── BackupClient.java     # Main program - menu, backup loop, orchestration
+├── FtpConnection.java    # Raw socket FTP - all protocol commands
+├── FileMonitor.java      # Directory watcher - detects NEW/MODIFIED/DELETED
 ├── TimestampStore.java   # Persists file timestamps to timestamps.dat
-├── RestoreClient.java    # Restore CLI — downloads versioned backups via RETR
+├── RestoreClient.java    # Restore CLI - downloads versioned backups via RETR
 ├── timestamps.dat        # Auto-generated: tracked file timestamps
 ├── versions.dat          # Auto-generated: version counters per filename
 └── watched_files/        # The directory being monitored
@@ -245,7 +245,7 @@ private static final String WATCH_DIR  = "watched_files";
 private static final int    POLL_INTERVAL = 60_000;   // 60 seconds
 ```
 
-`RestoreClient.java` has the same constants — update them to match.
+`RestoreClient.java` has the same constants - update them to match.
 
 
 ## Compile and Run
@@ -334,7 +334,7 @@ java RestoreClient                      # interactive menu
 
 A step-by-step walkthrough for demonstrating the full system.
 
-### Step 1 — Confirm vsftpd is running
+### Step 1 - Confirm vsftpd is running
 
 ```bash
 sudo systemctl status vsftpd
@@ -342,46 +342,46 @@ sudo systemctl status vsftpd
 
 Look for `Active: active`. If not: `sudo systemctl start vsftpd`
 
-### Step 2 — Compile
+### Step 2 - Compile
 
 ```bash
 cd ~/prac8
 javac *.java
 ```
 
-### Step 3 — Create a test file with real content
+### Step 3 - Create a test file with real content
 
 ```bash
 echo "Important meeting notes - do not lose this" > watched_files/notes.txt
 cat watched_files/notes.txt
 ```
 
-### Step 4 — Back it up (first version)
+### Step 4 - Back it up (first version)
 
 ```bash
 java BackupClient
 # choose option 2, then 6
 ```
 
-Point out: `STOR notes.txt.000` in the output — this is version 0 being written to the server via raw FTP socket.
+Point out: `STOR notes.txt.000` in the output - this is version 0 being written to the server via raw FTP socket.
 
-### Step 5 — Destroy the file
+### Step 5 - Destroy the file
 
 ```bash
 echo "" > watched_files/notes.txt
 cat watched_files/notes.txt    # shows empty
 ```
 
-### Step 6 — Back up the destroyed version
+### Step 6 - Back up the destroyed version
 
 ```bash
 java BackupClient
 # choose option 2, then 6
 ```
 
-Point out: `STOR notes.txt.001` — the empty version is now saved as version 1. Version 0 (the good one) is untouched on the server.
+Point out: `STOR notes.txt.001` - the empty version is now saved as version 1. Version 0 (the good one) is untouched on the server.
 
-### Step 7 — Verify both versions exist on server
+### Step 7 - Verify both versions exist on server
 
 ```bash
 ls /root/ftp_backup/
@@ -389,37 +389,37 @@ ls /root/ftp_backup/
 
 You should see: `notes.txt`, `notes.txt.000`, `notes.txt.001`
 
-### Step 8 — Restore the original
+### Step 8 - Restore the original
 
 ```bash
 java RestoreClient notes.txt 0
 ```
 
-Point out: `RETR notes.txt.000` — the client opens a new control connection, negotiates PASV, and pulls the file back down via the data channel.
+Point out: `RETR notes.txt.000` - the client opens a new control connection, negotiates PASV, and pulls the file back down via the data channel.
 
-### Step 9 — Confirm the content is back
+### Step 9 - Confirm the content is back
 
 ```bash
 cat watched_files/notes.txt
 # Important meeting notes - do not lose this
 ```
 
-### Step 10 — Show version listing (bonus)
+### Step 10 - Show version listing (bonus)
 
 ```bash
 java RestoreClient notes.txt list
 ```
 
-Shows all available versions with their numbers — useful for picking exactly which state to restore to.
+Shows all available versions with their numbers - useful for picking exactly which state to restore to.
 
-### Step 11 — Show the deletion safety feature (optional)
+### Step 11 - Show the deletion safety feature (optional)
 
 ```bash
 rm watched_files/notes.txt
 java BackupClient   # option 2
 ```
 
-Point out: `[BACKUP] Keeping backup on server — removing from local tracking only.`
+Point out: `[BACKUP] Keeping backup on server - removing from local tracking only.`
 
 Then verify:
 
@@ -449,17 +449,17 @@ The backup is never deleted even when the local file is gone.
 
 ## Subproblems Solved
 
-**Subproblem 1 — Detecting file changes:**  
+**Subproblem 1 - Detecting file changes:**  
 We store the `lastModified()` timestamp of every file in `timestamps.dat`. Every poll cycle we compare current timestamps against stored ones. Three cases: new file (not in store), modified file (timestamp changed), deleted file (in store but not on disk).
 
-**Subproblem 2 — The deletion problem:**  
-The assignment specifically warns against deleting backup files when local files are deleted. We handle this safely — when a deletion is detected, we remove the file from local tracking only. The server backup is never touched. You might have accidentally deleted it and want it back; that's exactly what the restore client is for.
+**Subproblem 2 - The deletion problem:**  
+The assignment specifically warns against deleting backup files when local files are deleted. We handle this safely - when a deletion is detected, we remove the file from local tracking only. The server backup is never touched. You might have accidentally deleted it and want it back; that's exactly what the restore client is for.
 
-**Subproblem 3 — Version history:**  
+**Subproblem 3 - Version history:**  
 Every upload is stored as a numbered version (`file.txt.000`, `file.txt.001` etc.) so you can recover not just the latest backup but any historical state. Version counters persist in `versions.dat` so they survive restarts.
 
-**Subproblem 4 — Bidirectional transfer (bonus):**  
-The restore client uses `RETR` over a PASV data connection — the same infrastructure as uploads but in reverse. This means you can type `java RestoreClient notes.txt 2` to pull any version back to your local machine at any time.
+**Subproblem 4 - Bidirectional transfer (bonus):**  
+The restore client uses `RETR` over a PASV data connection - the same infrastructure as uploads but in reverse. This means you can type `java RestoreClient notes.txt 2` to pull any version back to your local machine at any time.
 
 
 ## Troubleshooting
@@ -469,7 +469,7 @@ The restore client uses `RETR` over a PASV data connection — the same infrastr
 | `Connection refused` | vsftpd not running | `sudo systemctl start vsftpd` |
 | `530 Login incorrect` | Wrong credentials in code | Update `FTP_USER`/`FTP_PASS` in `BackupClient.java` |
 | `550 Permission denied` on STOR | `write_enable` not set | Add `write_enable=YES` to `/etc/vsftpd.conf` and restart |
-| `550` on MKD | Directory already exists | Normal — code handles this, CWD still works |
+| `550` on MKD | Directory already exists | Normal - code handles this, CWD still works |
 | Root can't log in | Root blocked in ftpusers | `sudo sed -i '/^root$/d' /etc/ftpusers` |
 | 
 
